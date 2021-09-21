@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "gcse-cs-nea"
+version = "0.1.0"
+description = "A multiplayer roguelike game made for my GCSE Computer Science NEA."
+authors = ["Lenny Critchley <LennyPhoenixC@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+pyglet = "^1.5.21"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
