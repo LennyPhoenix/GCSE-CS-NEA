@@ -79,7 +79,7 @@ Make a game that can be played on a desktop OS:
 > It should be noted that this is not meant to be a hard list for what I will work on, I will likely change the order and add more sub-tasks as I go.
 
 - [X] Project setup, get a decent dev environment.
-- [ ] Application with Window, Batches and Events.
+- [X] Application with Window, Batches and Events.
 - [ ] Game class with Camera and Player movement.
 - [ ] Networking and player syncing.
 - [ ] Combat and player UI.
