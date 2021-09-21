@@ -43,6 +43,13 @@ class Application:
         self.window.clear()  # Clear the screen
         self.batch.draw()    # Draw the batch
 
+    def on_key_press(self, symbol: int, modifiers: int):
+        """ Called every time the user presses a key on the keyboard. """
+        # If user pressed F11, toggle fullscreen
+        if symbol == key.F11:
+            # Set window's fullscreen to the opposite of the current value
+            self.window.set_fullscreen(not self.window.fullscreen)
+
     def run(self):
         """ Fire 'er up! """
         pyglet.app.run()  # This just starts the event loop
