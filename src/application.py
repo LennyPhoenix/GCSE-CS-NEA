@@ -3,6 +3,7 @@ Instantiate and launch the application itself.
 
 Classes:
 
+    ApplicationState
     Application
 
 Functions:
@@ -12,6 +13,18 @@ Functions:
 
 import pyglet
 from pyglet.window import key
+import enum
+
+
+class ApplicationState(enum.Enum):
+    """
+    The different possible states for the Application.
+    """
+    MAIN_MENU = 0
+    PLAY_MENU = 1
+    LOBBY_MENU = 2
+    IN_GAME = 3
+    SETTINGS_MENU = 4
 
 
 class Application:
@@ -22,6 +35,10 @@ class Application:
 
     # Set default size to a 720p window
     DEFAULT_SIZE = DEFAULT_WIDTH, DEFAULT_HEIGHT = 1280, 720
+
+    # For now we don't actually have a menu, so we just head straight into the
+    # game here.
+    current_state = ApplicationState.IN_GAME
 
     def __init__(self):
         """ Initialise the application: set up our window. """
