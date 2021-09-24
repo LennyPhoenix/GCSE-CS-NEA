@@ -11,6 +11,8 @@ Functions:
     run()
 """
 
+from .game_manager import GameManager
+
 import pyglet
 from pyglet.window import key
 from enum import Enum
@@ -41,11 +43,15 @@ class Application:
     DEFAULT_STATE = ApplicationState.IN_GAME
     _current_state: ApplicationState = None
 
+    # We don't need to initialise these until the application state has been
+    # switched over to them. For now we just forward declare their types.
+    game_manager: GameManager
+
     def __init__(self):
         """ Initialise the application: set up our window. """
         # Create our window
         self.window = pyglet.window.Window(
-            caption="Hello, Window!",
+            caption="Ooo, game state management...",
             resizable=True,
             vsync=False,
             width=self.DEFAULT_WIDTH,
@@ -93,6 +99,14 @@ class Application:
         """ Application state setter method. """
         # Only update the state if it has been changed.
         if new_state != self.current_state:
+            # Initialise the new state manager:
+            if new_state == ApplicationState.IN_GAME:
+                self.game_manager = GameManager()
+
+            # Kill the old state manager:
+            if self.current_state == ApplicationState.IN_GAME:
+                del self.game_manager
+
             # Apply the change
             self._current_state = new_state
 
