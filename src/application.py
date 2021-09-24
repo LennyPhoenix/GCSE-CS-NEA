@@ -1,5 +1,4 @@
-"""
-Instantiate and launch the application itself.
+""" Instantiate and launch the application itself.
 
 Classes:
 
@@ -19,9 +18,7 @@ from enum import Enum
 
 
 class ApplicationState(Enum):
-    """
-    The different possible states for the Application.
-    """
+    """ The different possible states for the Application. """
     MAIN_MENU = 0
     PLAY_MENU = 1
     LOBBY_MENU = 2
@@ -30,9 +27,8 @@ class ApplicationState(Enum):
 
 
 class Application:
-    """
-    Top level application manager, controls everything including the window and
-    any events.
+    """ Top level application manager, controls everything including the window
+    and any events.
     """
 
     # Set default size to a 720p window
@@ -48,7 +44,9 @@ class Application:
     game_manager: GameManager
 
     def __init__(self):
-        """ Initialise the application: set up our window. """
+        """ Initialise the application: set up our window and graphics batch,
+        and schedule any methods.
+        """
         # Create our window
         self.window = pyglet.window.Window(
             caption="Ooo, game state management...",

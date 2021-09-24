@@ -1,5 +1,4 @@
-"""
-Main file for the game, imports the Application's run function and calls it
+""" Main file for the game, imports the Application's run function and calls it
 immediately if this file has been run directly.
 """
 from src.application import run
