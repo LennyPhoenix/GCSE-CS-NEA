@@ -13,10 +13,10 @@ Functions:
 
 import pyglet
 from pyglet.window import key
-import enum
+from enum import Enum
 
 
-class ApplicationState(enum.Enum):
+class ApplicationState(Enum):
     """
     The different possible states for the Application.
     """
@@ -38,7 +38,8 @@ class Application:
 
     # For now we don't actually have a menu, so we just head straight into the
     # game here.
-    current_state = ApplicationState.IN_GAME
+    DEFAULT_STATE = ApplicationState.IN_GAME
+    _current_state: ApplicationState = None
 
     def __init__(self):
         """ Initialise the application: set up our window. """
@@ -55,6 +56,9 @@ class Application:
         # Create our graphics batch, this means we only need to perform a
         # single draw-call per frame.
         self.batch = pyglet.graphics.Batch()
+
+        # Set the application state
+        self.current_state = self.DEFAULT_STATE
 
         # Schedule our update methods
         pyglet.clock.schedule(self.on_update)
@@ -78,6 +82,19 @@ class Application:
     def run(self):
         """ Fire 'er up! """
         pyglet.app.run()  # This just starts the event loop
+
+    @property
+    def current_state(self) -> ApplicationState:
+        """ The current application state/focus. """
+        return self._current_state
+
+    @current_state.setter
+    def current_state(self, new_state: ApplicationState):
+        """ Application state setter method. """
+        # Only update the state if it has been changed.
+        if new_state != self.current_state:
+            # Apply the change
+            self._current_state = new_state
 
     def __del__(self):
         """ Application destructor. """
