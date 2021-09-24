@@ -56,6 +56,9 @@ class Application:
         # single draw-call per frame.
         self.batch = pyglet.graphics.Batch()
 
+        # Schedule our update methods
+        pyglet.clock.schedule(self.on_update)
+
     def on_draw(self):
         """ Called when the window needs to redraw. """
         self.window.clear()  # Clear the screen
@@ -68,9 +71,18 @@ class Application:
             # Set window's fullscreen to the opposite of the current value
             self.window.set_fullscreen(not self.window.fullscreen)
 
+    def on_update(self, dt: float):
+        """ Called every frame, dt is the time passed since the last frame. """
+        pass  # Unused
+
     def run(self):
         """ Fire 'er up! """
         pyglet.app.run()  # This just starts the event loop
+
+    def __del__(self):
+        """ Application destructor. """
+        # Unschedule any functions
+        pyglet.clock.unschedule(self.on_update)
 
 
 def run():
