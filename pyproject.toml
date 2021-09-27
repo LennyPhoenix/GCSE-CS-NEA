@@ -8,7 +8,6 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.9"
 pyglet = "^1.5.21"
-pymunk = "^6.2.0"
 
 [tool.poetry.dev-dependencies]
 

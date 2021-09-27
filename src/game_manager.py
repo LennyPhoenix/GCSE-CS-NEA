@@ -6,7 +6,6 @@ Classes:
 """
 
 import pyglet
-import pymunk
 
 
 class GameManager:
@@ -18,10 +17,7 @@ class GameManager:
     FIXED_UPDATE_TIMESTEP = 1/60
 
     def __init__(self):
-        """ Game Manager initialiser: setup physics space and schedule physics
-        update method.
-        """
-        self.physics_space = pymunk.Space()
+        """ Game Manager initialiser: schedule physics update method. """
 
         # Set up our physics update method
         pyglet.clock.schedule_interval(self.on_fixed_update,
@@ -31,7 +27,7 @@ class GameManager:
         """ Physics update method, called at a fixed speed independant of
         framerate.
         """
-        self.physics_space.step(self.FIXED_UPDATE_TIMESTEP)
+        pass
 
     def __del__(self):
         """ Game Manager destructor. """
