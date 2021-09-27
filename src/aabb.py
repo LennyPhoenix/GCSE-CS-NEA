@@ -6,6 +6,8 @@ Classes:
     AABB
 """
 
+# https://www.gamedev.net/articles/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/
+# https://www.amanotes.com/post/using-swept-aabb-to-detect-and-process-collision
 # TODO: Add docstrings and comments
 
 from typing import Tuple
