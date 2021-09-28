@@ -54,8 +54,8 @@ class AABB:
 
     def is_colliding_aabb(self, other: AABB) -> bool:
         return (
-            self.x <= other.x + other.width
-            and self.x + self.width >= other.x
-            and self.y <= other.y + other.height
-            and self.y + self.height >= other.y
+            self.x <= other.x + other.w
+            and self.x + self.w >= other.x
+            and self.y <= other.y + other.h
+            and self.y + self.h >= other.y
         )
