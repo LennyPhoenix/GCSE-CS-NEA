@@ -20,8 +20,10 @@ class GameManager:
         """ Game Manager initialiser: schedule physics update method. """
 
         # Set up our physics update method
-        pyglet.clock.schedule_interval(self.on_fixed_update,
-                                       self.FIXED_UPDATE_TIMESTEP)
+        pyglet.clock.schedule_interval(
+            self.on_fixed_update,
+            self.FIXED_UPDATE_TIMESTEP
+        )
 
     def on_fixed_update(self, dt: float):
         """ Physics update method, called at a fixed speed independant of
