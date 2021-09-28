@@ -11,12 +11,17 @@ Classes:
 # TODO: Add docstrings and comments
 
 from __future__ import annotations  # NOTE: This is necessary below Python 3.10
+
+import pyglet
+
 from typing import Tuple
 
 
 class AABB:
     # TODO: Add get_broad_phase method
     # TODO: Figure out better way of doing offsets
+
+    debug_rect: pyglet.shapes.Rectangle = None
 
     def __init__(self,
                  x: float,
@@ -68,3 +73,36 @@ class AABB:
             and self.y + self.offset[1] <= point[1]
             and point[1] <= self.y + self.offset[1] + self.h
         )
+
+    def create_debug_rect(
+        self,
+        colour: Tuple[int, int, int] = (255, 255, 255),
+        batch: pyglet.graphics.Batch = None,
+        group: pyglet.graphics.Group = None
+    ):
+        self.debug_rect = pyglet.shapes.Rectangle(
+            x=self.x,
+            y=self.y,
+            width=self.w,
+            height=self.h,
+            color=colour,
+            batch=batch,
+            group=group
+        )
+        self.debug_rect.anchor_position = (-self.offset[0], -self.offset[1])
+
+    def update_debug_rect(
+        self,
+        offset: Tuple[float, float] = (0, 0)
+    ):
+        # NOTE: By calling _update_position manually we only need to update
+        #       vertex coordinates once.
+        self.debug_rect._x, self.debug_rect._y = self.position
+        self.debug_rect._width, self.debug_rect._height = self.extends
+        self.debug_rect._anchor_x = -self.offset[0]
+        self.debug_rect._anchor_y = -self.offset[1]
+        self.debug_rect._update_position()
+
+    def __del__(self):
+        if self.debug_rect is not None:
+            self.debug_rect.delete()
