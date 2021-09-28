@@ -16,19 +16,21 @@ from typing import Tuple
 
 class AABB:
     # TODO: Add get_broad_phase method
-    # TODO: Add create/update_debug_rect method
+    # TODO: Figure out better way of doing offsets
 
     def __init__(self,
                  x: float,
                  y: float,
                  w: float,
                  h: float,
+                 offset: Tuple[float, float] = (0, 0),
                  layer: int = 0xFFFFFFFF,
                  mask: int = 0xFFFFFFFF):
         self.x = x
         self.y = y
         self.w = w
         self.h = h
+        self.offset = offset
         self.layer = layer
         self.mask = mask
 
@@ -53,14 +55,16 @@ class AABB:
 
     def is_colliding_aabb(self, other: AABB) -> bool:
         return (
-            self.x <= other.x + other.w
-            and self.x + self.w >= other.x
-            and self.y <= other.y + other.h
-            and self.y + self.h >= other.y
+            self.x + self.offset[0] <= other.x + other.offset[0] + other.w
+            and self.x + self.offset[0] + self.w >= other.x + other.offset[0]
+            and self.y + self.offset[1] <= other.y + other.offset[1] + other.h
+            and self.y + self.offset[1] + self.h >= other.y + other.offset[1]
         )
 
     def is_colliding_point(self, point: Tuple[float, float]) -> bool:
         return (
-            self.x <= point[0] <= self.x + self.w
-            and self.y <= point[1] <= self.y + self.h
+            self.x + self.offset[0] <= point[0]
+            and point[0] <= self.x + self.offset[0] + self.w
+            and self.y + self.offset[1] <= point[1]
+            and point[1] <= self.y + self.offset[1] + self.h
         )
