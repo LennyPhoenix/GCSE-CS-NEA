@@ -182,6 +182,8 @@ Something simple such as swept AABB collisions can solve this problem very easil
 - [ ] Game class with Camera and Player movement.
   - [X] Game Manager
   - [ ] Physics system
+    - [ ] AABBs
+    - [ ] Physics Bodies
   - [ ] Player movement
   - [ ] Camera system
 - [ ] Networking and player syncing.
