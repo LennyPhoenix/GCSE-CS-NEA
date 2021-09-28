@@ -15,7 +15,6 @@ from typing import Tuple
 
 
 class AABB:
-    # TODO: Add is_colliding method
     # TODO: Add get_broad_phase method
     # TODO: Add create/update_debug_rect method
 
@@ -58,4 +57,10 @@ class AABB:
             and self.x + self.w >= other.x
             and self.y <= other.y + other.h
             and self.y + self.h >= other.y
+        )
+
+    def is_colliding_point(self, point: Tuple[float, float]) -> bool:
+        return (
+            self.x <= point[0] <= self.x + self.w
+            and self.y <= point[1] <= self.y + self.h
         )
