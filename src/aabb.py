@@ -10,6 +10,7 @@ Classes:
 # https://www.amanotes.com/post/using-swept-aabb-to-detect-and-process-collision
 # TODO: Add docstrings and comments
 
+from __future__ import annotations  # NOTE: This is necessary below Python 3.10
 from typing import Tuple
 
 
@@ -50,3 +51,11 @@ class AABB:
     @extends.setter
     def extends(self, new_extends: Tuple[float, float]):
         self.w, self.h = new_extends
+
+    def is_colliding_aabb(self, other: AABB) -> bool:
+        return (
+            self.x <= other.x + other.width
+            and self.x + self.width >= other.x
+            and self.y <= other.y + other.height
+            and self.y + self.height >= other.y
+        )
