@@ -127,6 +127,52 @@ Write a graphical game that can be played from any common desktop operating syst
   - Host has full control, and should send dungeon and entity data to each client.
   - Clients compute their own player movement and resync with the host.
 
+### Physics System
+
+I have opted to avoid using a library like Pymunk for my physics system as it provides too many unnecessary tools that ultimately make the game's codebase more complex than it needs to be.
+
+My physics system needs to do a few basic things, and nothing more:
+
+- Allow objects to detect collisions between each other
+- Resolve collisions and avoid tunneling (using swept AABBs)
+- Mask out specific collision layers
+  - e.g. enemies + enemy bullets do not need to collide
+- Allow "move and slide" behaviour
+
+  ![Sliding response to a swept AABB collision](https://uploads.gamedev.net/monthly_04_2013/ccs-146537-0-83526600-1366678432.png)
+
+Something simple such as swept AABB collisions can solve this problem very easily and efficiently.
+
+#### References
+
+- [gamedev.net](https://www.gamedev.net/articles/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/)
+- [amanotes.com](https://www.amanotes.com/post/using-swept-aabb-to-detect-and-process-collision)
+
+#### Breakdown
+
+- AABB (Axis-Aligned Bounding Box)
+  - X, Y, Width, Height - Parameters
+  - Layer and Mask - Bit fields for collision masks
+  - Is Colliding AABB method: Takes AABB and checks if self and the other box overlap.
+  - Is Colliding Point method: Takes coordinate pair and checks if the point is within self.
+  - Get Broad Phase method: Takes a velocity pair and returns the broad phase bounding box of self moved by the given velocity.
+  - Get Collision Time method: Takes a velocity and another AABB, and returns the collision time between them. (0 to 1)
+  - Create Debug Rect method: Takes `*args` and `**kwargs` for a pyglet rect and generates a debug rectangle for the AABB.
+  - Get Debug Rect method: Returns the current debug rect, may be `None`.
+  - Update Debug Rect method: Updates the position, width, and height of the current debug rect.
+- Body
+  - A kinematic body that can contain a set of AABB colliders.
+  - X, Y - Position
+  - VX, VY - Velocity
+  - Colliders - Set of AABB colliders
+  - Step method: Loop over each collider in self, then over every other body and collider in the physics space to determine the collision with the lowest collision time. Use this to determine how far to move, before running Resolve Collision.
+    > This will very likely need optimising, look into spatial hashing and BB tree.
+  - Resolve Collision method: Takes a velocity, collision time, and collision normal and resolves the collision through either slide, push, stick or deflection resolution.
+    > Check "Responses" section of the gamedev.net article for more details here.
+- Space
+  - Really just needs to be a set of AABBs or Bodies.
+  - When optimising, maybe turn this into a spatial hash or BB tree.
+
 ## Progress
 
 > It should be noted that this is not meant to be a hard list for what I will work on, I will likely change the order and add more sub-tasks as I go.
@@ -134,6 +180,10 @@ Write a graphical game that can be played from any common desktop operating syst
 - [X] Project setup, get a decent dev environment.
 - [X] Application with Window, Batches and Events.
 - [ ] Game class with Camera and Player movement.
+  - [X] Game Manager
+  - [ ] Physics system
+  - [ ] Player movement
+  - [ ] Camera system
 - [ ] Networking and player syncing.
 - [ ] Combat and player UI.
 - [ ] Dungeon generation.
