@@ -18,11 +18,19 @@ class AABB:
     # TODO: Add get_broad_phase method
     # TODO: Add create/update_debug_rect method
 
-    def __init__(self, x: float, y: float, w: float, h: float):
+    def __init__(self,
+                 x: float,
+                 y: float,
+                 w: float,
+                 h: float,
+                 layer: int = 0xFFFFFFFF,
+                 mask: int = 0xFFFFFFFF):
         self.x = x
         self.y = y
         self.w = w
         self.h = h
+        self.layer = layer
+        self.mask = mask
 
     def __repr__(self) -> str:
         return f"AABB({self.x}, {self.y}, {self.w}, {self.h})"
