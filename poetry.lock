@@ -8,8 +8,8 @@ python-versions = "*"
 
 [metadata]
 lock-version = "1.1"
-python-versions = "^3.9"
-content-hash = "3ea288eda9150225f0d9ff0033d88603c4e419588c31cc5e6f73f5cc388bb2a5"
+python-versions = "^3.8"
+content-hash = "91cc696d147b4ecd1153d8e31716b91f04046068941e99dbcd9dbf93113608ea"
 
 [metadata.files]
 pyglet = [

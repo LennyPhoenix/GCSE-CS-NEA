@@ -6,7 +6,7 @@ authors = ["Lenny Critchley <LennyPhoenixC@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 pyglet = "^1.5.21"
 
 [tool.poetry.dev-dependencies]
