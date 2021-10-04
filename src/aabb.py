@@ -21,8 +21,6 @@ from typing import Optional, Tuple
 
 
 class AABB(Object2D):
-    # TODO: Add get_broad_phase method
-
     debug_rect: pyglet.shapes.Rectangle = None
 
     def __init__(
@@ -66,6 +64,17 @@ class AABB(Object2D):
             and self.global_y <= point.y
             and point.y <= self.global_y + self.h
         )
+
+    def get_broad_phase(self, velocity: Vec2) -> AABB:
+        x = min(self.x, self.x + velocity.x)
+        y = min(self.y, self.y + velocity.y)
+        # Old method, calculates the maximum side, then subtracts new pos
+        # w = max(self.x + self.w, self.x + self.w + velocity.x) - x
+        # h = max(self.y + self.h, self.y + self.h + velocity.y) - y
+        # New method, calculates the absolute of the velocity and adds it
+        w = self.w + abs(velocity.x)
+        h = self.h + abs(velocity.y)
+        return AABB(x, y, w, h, parent=self.parent)
 
     def create_debug_rect(
         self,

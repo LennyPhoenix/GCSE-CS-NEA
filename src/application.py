@@ -50,7 +50,7 @@ class Application:
         """
         # Create our window
         self.window = pyglet.window.Window(
-            caption="Ooo, game state management...",
+            caption="Axis-Aligned Bounding Boxes!",
             resizable=True,
             vsync=False,
             width=self.DEFAULT_WIDTH,
