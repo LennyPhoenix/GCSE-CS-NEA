@@ -15,6 +15,7 @@ from __future__ import annotations  # NOTE: This is necessary below Python 3.10
 from .object2d import Object2D
 
 import pyglet
+from pyglet.math import Vec2
 
 from typing import Optional, Tuple
 
@@ -43,11 +44,11 @@ class AABB(Object2D):
         self.parent = parent
 
     @property
-    def extends(self) -> Tuple[float, float]:
-        return (self.w, self.h)
+    def extends(self) -> Vec2:
+        return Vec2(self.w, self.h)
 
     @extends.setter
-    def extends(self, new_extends: Tuple[float, float]):
+    def extends(self, new_extends: Vec2):
         self.w, self.h = new_extends
 
     def is_colliding_aabb(self, other: AABB) -> bool:
@@ -58,12 +59,12 @@ class AABB(Object2D):
             and self.global_y + self.h >= other.global_y
         )
 
-    def is_colliding_point(self, point: Tuple[float, float]) -> bool:
+    def is_colliding_point(self, point: Vec2) -> bool:
         return (
-            self.global_x <= point[0]
-            and point[0] <= self.global_x + self.w
-            and self.global_y <= point[1]
-            and point[1] <= self.global_y + self.h
+            self.global_x <= point.x
+            and point.x <= self.global_x + self.w
+            and self.global_y <= point.y
+            and point.y <= self.global_y + self.h
         )
 
     def create_debug_rect(

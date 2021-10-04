@@ -7,7 +7,9 @@ Classes:
 
 from __future__ import annotations  # NOTE: This is necessary below Python 3.10
 
-from typing import Optional, Tuple
+from pyglet.math import Vec2
+
+from typing import Optional
 from weakref import ref, ReferenceType as Ref
 
 
@@ -26,12 +28,12 @@ class Object2D:
         self.parent = parent
 
     @property
-    def position(self) -> Tuple[float, float]:
+    def position(self) -> Vec2:
         """ A tuple of the local X and Y coordinates. """
-        return (self.x, self.y)
+        return Vec2(self.x, self.y)
 
     @position.setter
-    def position(self, new_position: Tuple[float, float]):
+    def position(self, new_position: Vec2):
         """ Assigns new position directly to local X and Y. """
         self.x, self.y = new_position
 
@@ -70,12 +72,12 @@ class Object2D:
         self.y = y
 
     @property
-    def global_position(self) -> Tuple[float, float]:
+    def global_position(self) -> Vec2:
         """ A tuple of the global X and Y coordinates. """
-        return (self.global_x, self.global_y)
+        return Vec2(self.global_x, self.global_y)
 
     @global_position.setter
-    def global_position(self, new_global_position: Tuple[float, float]):
+    def global_position(self, new_global_position: Vec2):
         """ Assigns new global position to global X and Y, offsetting the local
         position.
         """
