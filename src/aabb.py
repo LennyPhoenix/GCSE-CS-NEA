@@ -17,7 +17,20 @@ from .object2d import Object2D
 import pyglet
 from pyglet.math import Vec2
 
+from dataclasses import dataclass
 from typing import Optional, Tuple
+
+
+@dataclass
+class CollisionData:
+    collided: bool
+    x_entry: float
+    x_exit: float
+    x_normal: float
+    y_entry: float
+    y_exit: float
+    y_normal: float
+    collision_time: float
 
 
 class AABB(Object2D):
@@ -75,6 +88,80 @@ class AABB(Object2D):
         w = self.w + abs(velocity.x)
         h = self.h + abs(velocity.y)
         return AABB(x, y, w, h, parent=self.parent)
+
+    def get_collision_data(self, other: AABB, velocity: Vec2) -> CollisionData:
+        # Hey! This code is awful! Its slow, and basically just dumps the
+        # collision data for the user to deal with themself.
+        # TODO: Extract out into individual functions, preferably with each
+        #       axis.
+
+        # Determine exit and entry points in inverse time
+        if velocity.x > 0:
+            x_inv_entry = other.global_x - (self.global_x + self.w)
+            x_inv_exit = (other.global_x + other.w) - self.global_x
+        else:
+            x_inv_entry = (other.global_x + other.w) - self.global_x
+            x_inv_exit = other.global_x - (self.global_x + self.w)
+
+        if velocity.y > 0:
+            y_inv_entry = other.global_y - (self.global_y + self.h)
+            y_inv_exit = (other.global_y + other.h) - self.global_y
+        else:
+            y_inv_entry = (other.global_y + other.h) - self.global_y
+            y_inv_exit = other.global_y - (self.global_y + self.h)
+
+        # Calculate actual exit and entry times
+        if velocity.x == 0:
+            x_entry = -float("inf")
+            x_exit = float("inf")
+        else:
+            x_entry = x_inv_entry / velocity.x
+            x_exit = x_inv_exit / velocity.x
+
+        if velocity.y == 0:
+            y_entry = -float("inf")
+            y_exit = float("inf")
+        else:
+            y_entry = y_inv_entry / velocity.y
+            y_exit = y_inv_exit / velocity.y
+
+        # Use closest entry and furthest exit
+        entry_time = min(x_entry, y_entry)
+        exit_time = max(x_exit, y_exit)
+
+        # Calculate normals
+        if (
+            entry_time > exit_time
+            or (x_entry < 0 and y_entry < 0)
+            or x_entry > 1 or y_entry > 1
+        ):
+            collided = False
+            x_normal = 0.0
+            y_normal = 0.0
+        else:
+            collided = True
+            if x_entry > y_entry:
+                if x_inv_entry < 0:
+                    x_normal = 1
+                    y_normal = 0
+                else:
+                    x_normal = -1
+                    y_normal = 0
+            else:
+                if y_inv_entry < 0:
+                    x_normal = 0
+                    y_normal = 1
+                else:
+                    x_normal = 0
+                    y_normal = -1
+
+        # Return data
+        return CollisionData(
+            collided,
+            x_entry, x_exit, x_normal,
+            y_entry, y_exit, y_normal,
+            entry_time
+        )
 
     def create_debug_rect(
         self,
