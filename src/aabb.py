@@ -126,8 +126,8 @@ class AABB(Object2D):
             y_exit = y_inv_exit / velocity.y
 
         # Use closest entry and furthest exit
-        entry_time = min(x_entry, y_entry)
-        exit_time = max(x_exit, y_exit)
+        entry_time = max(x_entry, y_entry)
+        exit_time = min(x_exit, y_exit)
 
         # Calculate normals
         if (
