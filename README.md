@@ -150,8 +150,13 @@ Something simple such as swept AABB collisions can solve this problem very easil
 
 #### Breakdown
 
-- AABB (Axis-Aligned Bounding Box)
-  - X, Y, Width, Height - Parameters
+- Object2D
+  - An object in 2D space
+  - X & Y - Local position
+  - Parent - The parent object
+  - Global X & Y - The position relative to world origin
+- AABB (Axis-Aligned Bounding Box, inherits Object2D)
+  - Width & Height - Bounding box extension
   - Layer and Mask - Bit fields for collision masks
   - Is Colliding AABB method: Takes AABB and checks if self and the other box overlap.
   - Is Colliding Point method: Takes coordinate pair and checks if the point is within self.
@@ -160,17 +165,14 @@ Something simple such as swept AABB collisions can solve this problem very easil
   - Create Debug Rect method: Takes `*args` and `**kwargs` for a pyglet rect and generates a debug rectangle for the AABB.
   - Get Debug Rect method: Returns the current debug rect, may be `None`.
   - Update Debug Rect method: Updates the position, width, and height of the current debug rect.
-- Body
-  - A kinematic body that can contain a set of AABB colliders.
-  - X, Y - Position
-  - VX, VY - Velocity
-  - Colliders - Set of AABB colliders
-  - Step method: Loop over each collider in self, then over every other body and collider in the physics space to determine the collision with the lowest collision time. Use this to determine how far to move, before running Resolve Collision.
-    > This will very likely need optimising, look into spatial hashing and BB tree.
-  - Resolve Collision method: Takes a velocity, collision time, and collision normal and resolves the collision through either slide, push, stick or deflection resolution.
+- Body (Inherits AABB)
+  - Move method: Gets nearest collision data and resolves by stopping at collision, returning the remaining velocity.
+  - Move and Slide: Repeatedly moves until velocity is zero.
     > Check "Responses" section of the gamedev.net article for more details here.
+  - Get nearest collision: Loops over each bounding box in the space given and returns the collision data for the nearest collision.
+    > This will very likely need optimising, look into spatial hashing and BB tree.
 - Space
-  - Really just needs to be a set of AABBs or Bodies.
+  - Really just needs to be a set of AABBs.
   - When optimising, maybe turn this into a spatial hash or BB tree.
 
 ## Progress
