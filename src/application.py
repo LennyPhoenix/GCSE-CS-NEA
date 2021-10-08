@@ -58,6 +58,10 @@ class Application:
         )
         self.window.push_handlers(self)  # Register self as an event handler
 
+        # Register KeyStateHandler
+        self.keys = key.KeyStateHandler()
+        self.window.push_handlers(self.keys)
+
         # Create our graphics batch, this means we only need to perform a
         # single draw-call per frame.
         self.batch = pyglet.graphics.Batch()
