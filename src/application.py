@@ -104,7 +104,10 @@ class Application:
         if new_state != self.current_state:
             # Initialise the new state manager:
             if new_state == ApplicationState.IN_GAME:
-                self.game_manager = GameManager()
+                self.game_manager = GameManager(
+                    batch=self.batch,
+                    keys=self.keys
+                )
 
             # Kill the old state manager:
             if self.current_state == ApplicationState.IN_GAME:
