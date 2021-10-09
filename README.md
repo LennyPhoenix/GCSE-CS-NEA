@@ -183,9 +183,10 @@ Something simple such as swept AABB collisions can solve this problem very easil
 - [X] Application with Window, Batches and Events.
 - [ ] Game class with Camera and Player movement.
   - [X] Game Manager
-  - [ ] Physics system
-    - [ ] AABBs
-    - [ ] Physics Bodies
+  - [X] Physics system
+    - [X] AABBs
+    - [X] Physics Bodies
+    - [ ] Documentation
   - [ ] Player movement
   - [ ] Camera system
 - [ ] Networking and player syncing.
