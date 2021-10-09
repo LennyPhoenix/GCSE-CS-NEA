@@ -64,7 +64,8 @@ class AABB(Object2D):
 
     def is_colliding_aabb(self, other: AABB) -> bool:
         return (
-            self.global_x < other.global_x + other.w
+            self.mask & other.layer
+            and self.global_x < other.global_x + other.w
             and self.global_x + self.w > other.global_x
             and self.global_y < other.global_y + other.h
             and self.global_y + self.h > other.global_y
@@ -87,7 +88,12 @@ class AABB(Object2D):
         # New method, calculates the absolute of the velocity and adds it
         w = self.w + abs(velocity.x)
         h = self.h + abs(velocity.y)
-        return AABB(x, y, w, h, parent=self.parent)
+        return AABB(
+            x, y, w, h,
+            parent=self.parent,
+            mask=self.mask,
+            layer=self.layer
+        )
 
     def get_axis_entry(x, w, ox, ow, v):
         pass
