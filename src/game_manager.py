@@ -52,19 +52,18 @@ class GameManager:
         framerate.
         """
         vx, vy = 0, 0
-
         if self.keys[key.W]:
-            vy += 10
+            vy += 1
         if self.keys[key.A]:
-            vx -= 10
+            vx -= 1
         if self.keys[key.S]:
-            vy -= 10
+            vy -= 1
         if self.keys[key.D]:
-            vx += 10
+            vx += 1
+        velocity = pyglet.math.Vec2(vx, vy).normalize()
+        velocity = velocity * pyglet.math.Vec2(50 * dt, 50 * dt)
 
-        velocity = pyglet.math.Vec2(vx * dt, vy * dt)
-        self.body.move(self.space, velocity)
-
+        self.body.move_and_slide(self.space, velocity)
         self.body.update_debug_rect()
 
     def __del__(self):

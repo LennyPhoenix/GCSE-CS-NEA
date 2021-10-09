@@ -42,10 +42,31 @@ class Body(AABB):
         nearest_collision = self.get_nearest_collision(space, velocity)
         if nearest_collision is None:
             self.position += velocity
+
+            new_velocity = Vec2(0, 0)
         else:
             self.x += velocity.x * nearest_collision.collision_time
             self.y += velocity.y * nearest_collision.collision_time
 
-        # TODO: Figure out left-over velocity
+            dot_product = (
+                velocity.x * nearest_collision.y_normal
+                + velocity.y * nearest_collision.x_normal
+            ) * (1-nearest_collision.collision_time)
 
-        return Vec2(0, 0)
+            new_velocity = Vec2(
+                dot_product * nearest_collision.y_normal,
+                dot_product * nearest_collision.x_normal
+            )
+
+        return new_velocity
+
+    def move_and_slide(
+        self,
+        space: Set[AABB],
+        velocity: Vec2,
+        max_bounce: int = 3,
+    ):
+        counter = 0
+        while velocity != Vec2(0, 0) and counter < max_bounce:
+            velocity = self.move(space, velocity)
+            counter += 1
