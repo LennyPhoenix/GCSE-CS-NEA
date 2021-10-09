@@ -108,9 +108,11 @@ class Application:
                     batch=self.batch,
                     keys=self.keys
                 )
+                self.window.push_handlers(self.game_manager)
 
             # Kill the old state manager:
             if self.current_state == ApplicationState.IN_GAME:
+                self.window.remove_handlers(self.game_manager)
                 del self.game_manager
 
             # Apply the change

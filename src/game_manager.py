@@ -37,15 +37,24 @@ class GameManager:
         self.body = Body(100, 95, 10, 10)
         self.body.create_debug_rect(batch=batch)
         self.space.add(self.body)
-        self.box = AABB(120, 85, 30, 30)
-        self.box.create_debug_rect(batch=batch)
-        self.space.add(self.box)
+        self.box_1 = AABB(120, 85, 30, 30)
+        self.box_1.create_debug_rect(batch=batch)
+        self.space.add(self.box_1)
+        self.box_2 = AABB(100, 65, 30, 30)
+        self.box_2.create_debug_rect(batch=batch)
+        self.space.add(self.box_2)
+        self.box_3 = AABB(140, 65, 30, 30)
+        self.box_3.create_debug_rect(batch=batch)
+        self.space.add(self.box_3)
 
         # Set up our physics update method
         pyglet.clock.schedule_interval(
             self.on_fixed_update,
             self.FIXED_UPDATE_TIMESTEP
         )
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        self.body.global_position = x, y
 
     def on_fixed_update(self, dt: float):
         """ Physics update method, called at a fixed speed independant of
