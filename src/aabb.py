@@ -64,10 +64,10 @@ class AABB(Object2D):
 
     def is_colliding_aabb(self, other: AABB) -> bool:
         return (
-            self.global_x <= other.global_x + other.w
-            and self.global_x + self.w >= other.global_x
-            and self.global_y <= other.global_y + other.h
-            and self.global_y + self.h >= other.global_y
+            self.global_x < other.global_x + other.w
+            and self.global_x + self.w > other.global_x
+            and self.global_y < other.global_y + other.h
+            and self.global_y + self.h > other.global_y
         )
 
     def is_colliding_point(self, point: Vec2) -> bool:
@@ -88,6 +88,9 @@ class AABB(Object2D):
         w = self.w + abs(velocity.x)
         h = self.h + abs(velocity.y)
         return AABB(x, y, w, h, parent=self.parent)
+
+    def get_axis_entry(x, w, ox, ow, v):
+        pass
 
     def get_collision_data(self, other: AABB, velocity: Vec2) -> CollisionData:
         # Hey! This code is awful! Its slow, and basically just dumps the
@@ -132,12 +135,12 @@ class AABB(Object2D):
         # Calculate normals
         if (
             entry_time > exit_time
-            or (x_entry < 0 and y_entry < 0)
+            or x_entry < 0 and y_entry < 0 and x_exit <= 0 and y_exit <= 0
             or x_entry > 1 or y_entry > 1
         ):
             collided = False
-            x_normal = 0.0
-            y_normal = 0.0
+            x_normal = 0
+            y_normal = 0
         else:
             collided = True
             if x_entry > y_entry:
@@ -160,7 +163,7 @@ class AABB(Object2D):
             collided,
             x_entry, x_exit, x_normal,
             y_entry, y_exit, y_normal,
-            entry_time
+            entry_time if abs(entry_time) < abs(exit_time) else exit_time
         )
 
     def create_debug_rect(
