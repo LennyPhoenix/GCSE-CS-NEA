@@ -1,5 +1,29 @@
 # Computer Science Non-Examined Assessment (GCSE)
 
+## Progress
+
+> It should be noted that this is not meant to be a hard list for what I will work on, I will likely change the order and add more sub-tasks as I go.
+
+- [X] Project setup, get a decent dev environment.
+- [X] Application with Window, Batches and Events.
+- [ ] Game class with Camera and Player movement.
+  - [X] Game Manager
+  - [ ] Physics system
+    - [X] AABBs
+    - [X] Physics Bodies
+    - [X] Documentation
+    - [ ] Split up swept algorithm
+  - [ ] Player movement
+  - [ ] Camera system
+- [ ] Networking and player syncing.
+- [ ] Combat and player UI.
+- [ ] Dungeon generation.
+- [ ] Enemies.
+- [ ] Player classes and different weapons.
+- [ ] Chest rooms and combat rooms.
+- [ ] Exit room.
+- [ ] Main menu and UI.
+
 ## Analysis
 
 ### Introduction
@@ -174,26 +198,3 @@ Something simple such as swept AABB collisions can solve this problem very easil
 - Space
   - Really just needs to be a set of AABBs.
   - When optimising, maybe turn this into a spatial hash or BB tree.
-
-## Progress
-
-> It should be noted that this is not meant to be a hard list for what I will work on, I will likely change the order and add more sub-tasks as I go.
-
-- [X] Project setup, get a decent dev environment.
-- [X] Application with Window, Batches and Events.
-- [ ] Game class with Camera and Player movement.
-  - [X] Game Manager
-  - [X] Physics system
-    - [X] AABBs
-    - [X] Physics Bodies
-    - [ ] Documentation
-  - [ ] Player movement
-  - [ ] Camera system
-- [ ] Networking and player syncing.
-- [ ] Combat and player UI.
-- [ ] Dungeon generation.
-- [ ] Enemies.
-- [ ] Player classes and different weapons.
-- [ ] Chest rooms and combat rooms.
-- [ ] Exit room.
-- [ ] Main menu and UI.
