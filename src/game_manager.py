@@ -53,7 +53,8 @@ class GameManager:
             self.FIXED_UPDATE_TIMESTEP
         )
 
-    def on_mouse_press(self, x, y, button, modifiers):
+    def on_mouse_press(self, x: float, y: float, button: int, modifiers: int):
+        """ Called when the user presses a mouse button within the window. """
         self.body.global_position = x, y
 
     def on_fixed_update(self, dt: float):
