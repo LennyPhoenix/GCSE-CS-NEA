@@ -24,13 +24,8 @@ from typing import Optional, Tuple
 class CollisionData:
     """ Collision data dump class. """
     collided: bool
-    x_entry: float
-    x_exit: float
-    x_normal: float
-    y_entry: float
-    y_exit: float
-    y_normal: float
     collision_time: float
+    normals: Vec2
 
 
 class AABB(Object2D):
@@ -113,90 +108,164 @@ class AABB(Object2D):
             layer=self.layer
         )
 
-    def get_axis_entry(x, w, ox, ow, v):
-        pass
+    @staticmethod
+    def get_axis_collision_distances(
+        p: float, w: float, v: float,
+        op: float, ow: float
+    ) -> Tuple[float, float]:
+        """ Gets the distance to the entry and exit points of a collision on
+        one axis.
 
-    def get_collision_data(self, other: AABB, velocity: Vec2) -> CollisionData:
-        """ Gross function to get the collision data between this and another
-        bounding box, using a given velocity.
+        Parameters:
+
+            p: float - Position of first object
+            w: float - Width of first object
+            v: float - Velocity of first object
+            op: float - Position of other object
+            ow: float - Width of other object
+
+        Returns:
+
+            Tuple of entry and exit distances.
+
+            Tuple[float, float]
         """
-        # Hey! This code is awful! Its slow, and basically just dumps the
-        # collision data for the user to deal with themself.
-        # TODO: Extract out into individual functions, preferably with each
-        #       axis.
+        r_to_ol = op - (p + w)
+        l_to_or = (op + ow) - p
 
-        # Determine exit and entry points in inverse time
-        if velocity.x > 0:
-            x_inv_entry = other.global_x - (self.global_x + self.w)
-            x_inv_exit = (other.global_x + other.w) - self.global_x
+        if v > 0:
+            distance_entry = r_to_ol
+            distance_exit = l_to_or
         else:
-            x_inv_entry = (other.global_x + other.w) - self.global_x
-            x_inv_exit = other.global_x - (self.global_x + self.w)
+            distance_entry = l_to_or
+            distance_exit = r_to_ol
 
-        if velocity.y > 0:
-            y_inv_entry = other.global_y - (self.global_y + self.h)
-            y_inv_exit = (other.global_y + other.h) - self.global_y
+        return (distance_entry, distance_exit)
+
+    @staticmethod
+    def get_axis_collision_times(
+        distance_entry: float,
+        distance_exit: float,
+        v: float
+    ) -> Tuple[float, float]:
+        """ Gets the entry and exit times for a collision in 1 dimension.
+
+        Parameters:
+
+            distance_entry: float - Entry distance of first object to other.
+            distance_exit: float - Exit distance of first object to other.
+            v: float - Velocity of first object
+
+        Returns:
+
+            Tuple of entry and exit times.
+
+            Tuple[float, float]
+        """
+
+        if v == 0:
+            entry_time = -float("inf")
+            exit_time = float("inf")
         else:
-            y_inv_entry = (other.global_y + other.h) - self.global_y
-            y_inv_exit = other.global_y - (self.global_y + self.h)
+            entry_time = distance_entry / v
+            exit_time = distance_exit / v
 
-        # Calculate actual exit and entry times
-        if velocity.x == 0:
-            x_entry = -float("inf")
-            x_exit = float("inf")
-        else:
-            x_entry = x_inv_entry / velocity.x
-            x_exit = x_inv_exit / velocity.x
+        return (entry_time, exit_time)
 
-        if velocity.y == 0:
-            y_entry = -float("inf")
-            y_exit = float("inf")
-        else:
-            y_entry = y_inv_entry / velocity.y
-            y_exit = y_inv_exit / velocity.y
+    @staticmethod
+    def get_collision_normals(
+        collided: bool,
+        entry_times: Vec2,
+        entry_distances: Vec2
+    ) -> Vec2:
+        """ Calculates the normals for a collision.
 
-        # Use closest entry and furthest exit
-        entry_time = max(x_entry, y_entry)
-        exit_time = min(x_exit, y_exit)
+        Parameters:
 
-        # Calculate normals
-        if (
-            # No motion
-            entry_time > exit_time
-            # Collision already happened
-            or x_entry < 0 and y_entry < 0 and x_exit <= 0 and y_exit <= 0
-            # Collision happens further than 1 time step away
-            or x_entry > 1 or y_entry > 1
-        ):
-            # No collision this step
-            collided = False
-            x_normal = 0
-            y_normal = 0
-        else:
-            collided = True
-            if x_entry > y_entry:
-                if x_inv_entry < 0:
+            collided: bool - Whether there was a collision
+            entry_times: Vec2 - The times until a collision on each axis.
+            entry_distances: Vec2 - The distances until a collision on each
+                                    axis.
+
+        Returns:
+
+            Vector of collision normals.
+
+            Vec2
+        """
+
+        x_normal = 0
+        y_normal = 0
+
+        if collided:
+            if entry_times.x > entry_times.y:
+                if entry_distances.x < 0:
                     x_normal = 1
-                    y_normal = 0
                 else:
                     x_normal = -1
-                    y_normal = 0
             else:
-                if y_inv_entry < 0:
-                    x_normal = 0
+                if entry_distances.y < 0:
                     y_normal = 1
                 else:
-                    x_normal = 0
                     y_normal = -1
+
+        return Vec2(x_normal, y_normal)
+
+    def get_collision_data(self, other: AABB, velocity: Vec2) -> CollisionData:
+        """ Get the collision data between this and another bounding box, using
+        a given velocity.
+        """
+
+        # Get Collision Distances
+        x_entry_dist, x_exit_dist = self.get_axis_collision_distances(
+            self.global_x, self.w, velocity.x,
+            other.global_x, other.w
+        )
+        y_entry_dist, y_exit_dist = self.get_axis_collision_distances(
+            self.global_y, self.h, velocity.y,
+            other.global_y, other.h
+        )
+        entry_distances = Vec2(x_entry_dist, y_entry_dist)
+
+        # Get Collision Times
+        x_entry_time, x_exit_time = self.get_axis_collision_times(
+            x_entry_dist, x_exit_dist,
+            velocity.x
+        )
+        y_entry_time, y_exit_time = self.get_axis_collision_times(
+            y_entry_dist, y_exit_dist,
+            velocity.y
+        )
+        entry_times = Vec2(x_entry_time, y_entry_time)
+
+        # Use closest entry and furthest exit
+        entry_time = max(x_entry_time, y_entry_time)
+        exit_time = min(x_exit_time, y_exit_time)
+
+        # Was there a collision?
+        collided = not (
+            # No motion
+            entry_time > exit_time
+            # Or collision already happened
+            or exit_time <= 0
+            # Or collision happens further than 1 time step away
+            or entry_time > 1
+        )
+
+        # Get collision normals
+        normals = self.get_collision_normals(
+            collided,
+            entry_times,
+            entry_distances,
+        )
 
         # Return data
         return CollisionData(
             collided,
-            x_entry, x_exit, x_normal,
-            y_entry, y_exit, y_normal,
             # Use whichever is nearest to resolve ongoing collisions in the
             # neatest manner.
-            entry_time if abs(entry_time) < abs(exit_time) else exit_time
+            entry_time if abs(entry_time) < abs(exit_time) else exit_time,
+            normals,
         )
 
     def create_debug_rect(

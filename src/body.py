@@ -60,14 +60,14 @@ class Body(AABB):
 
             # Calculate dot product of normals and velocity
             dot_product = (
-                velocity.x * nearest_collision.y_normal
-                + velocity.y * nearest_collision.x_normal
+                velocity.x * nearest_collision.normals.y
+                + velocity.y * nearest_collision.normals.x
             ) * (1-nearest_collision.collision_time)
 
             # Determine new velocity
             new_velocity = Vec2(
-                dot_product * nearest_collision.y_normal,
-                dot_product * nearest_collision.x_normal
+                dot_product * nearest_collision.normals.y,
+                dot_product * nearest_collision.normals.x
             )
 
         return new_velocity
