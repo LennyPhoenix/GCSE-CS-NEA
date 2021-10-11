@@ -5,19 +5,85 @@ Classes:
     Body
 """
 
-from __future__ import annotations
+from __future__ import annotations  # NOTE: This is necessary below Python 3.10
 
-from .aabb import AABB, CollisionData
+from .aabb import AABB
 
 from pyglet.math import Vec2
 
+from dataclasses import dataclass
 from typing import Optional, Set
+
+
+@dataclass
+class CollisionData:
+    """ Collision data dump class. """
+    collided: bool
+    collision_time: float
+    normals: Vec2
 
 
 class Body(AABB):
     """ A moving bounding box in 2D space. Contains some helper methods for
     finding the nearest collision in the space, and resolving the collision.
     """
+
+    def get_collision_data(self, other: AABB, velocity: Vec2) -> CollisionData:
+        """ Get the collision data between this and another bounding box, using
+        a given velocity.
+        """
+
+        # Get Collision Distances
+        x_entry_dist, x_exit_dist = self.get_axis_collision_distances(
+            self.global_x, self.w, velocity.x,
+            other.global_x, other.w
+        )
+        y_entry_dist, y_exit_dist = self.get_axis_collision_distances(
+            self.global_y, self.h, velocity.y,
+            other.global_y, other.h
+        )
+        entry_distances = Vec2(x_entry_dist, y_entry_dist)
+
+        # Get Collision Times
+        x_entry_time, x_exit_time = self.get_axis_collision_times(
+            x_entry_dist, x_exit_dist,
+            velocity.x
+        )
+        y_entry_time, y_exit_time = self.get_axis_collision_times(
+            y_entry_dist, y_exit_dist,
+            velocity.y
+        )
+        entry_times = Vec2(x_entry_time, y_entry_time)
+
+        # Use closest entry and furthest exit
+        entry_time = max(x_entry_time, y_entry_time)
+        exit_time = min(x_exit_time, y_exit_time)
+
+        # Was there a collision?
+        collided = not (
+            # No motion
+            entry_time > exit_time
+            # Or collision already happened
+            or exit_time <= 0
+            # Or collision happens further than 1 time step away
+            or entry_time > 1
+        )
+
+        # Get collision normals
+        normals = self.get_collision_normals(
+            collided,
+            entry_times,
+            entry_distances,
+        )
+
+        # Return data
+        return CollisionData(
+            collided,
+            # Use whichever is nearest to resolve ongoing collisions in the
+            # neatest manner.
+            entry_time if abs(entry_time) < abs(exit_time) else exit_time,
+            normals,
+        )
 
     def get_nearest_collision(
         self,
