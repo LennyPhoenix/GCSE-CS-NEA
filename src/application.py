@@ -56,7 +56,9 @@ class Application:
             width=self.DEFAULT_WIDTH,
             height=self.DEFAULT_HEIGHT,
         )
-        self.window.push_handlers(self)  # Register self as an event handler
+        # Push event handlers
+        self.window.on_draw = self.on_draw
+        self.window.on_key_press = self.on_key_press
 
         # Register KeyStateHandler
         self.keys = key.KeyStateHandler()
