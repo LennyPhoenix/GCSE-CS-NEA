@@ -8,13 +8,17 @@
 - [X] Application with Window, Batches and Events.
 - [ ] Game class with Camera and Player movement.
   - [X] Game Manager
-  - [ ] Physics system
+  - [X] Physics system
     - [X] AABBs
     - [X] Physics Bodies
     - [X] Documentation
-    - [ ] Split up swept algorithm
-  - [ ] Player movement
-  - [ ] Camera system
+    - [X] Split up swept algorithm
+  - [ ] Player
+    - [ ] Movement
+    - [ ] Camera system (use groups)
+    - [ ] Dash
+    - [ ] Sprite
+    - [ ] Animation
 - [ ] Networking and player syncing.
 - [ ] Combat and player UI.
 - [ ] Dungeon generation.
