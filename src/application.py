@@ -122,6 +122,8 @@ class Application:
 
     def __del__(self):
         """ Application destructor. """
+        self.current_state = None
+
         # Unschedule any functions
         pyglet.clock.unschedule(self.on_update)
 

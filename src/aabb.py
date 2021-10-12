@@ -22,6 +22,8 @@ from typing import Optional, Tuple
 class AABB(Object2D):
     """ An Axis-Aligned Bounding Box, essentially a rect in 2D space. """
 
+    DEFAULT_LAYER = 1 << 0
+
     # The pyglet rect debug renderer
     debug_rect: pyglet.shapes.Rectangle = None
 
@@ -31,8 +33,8 @@ class AABB(Object2D):
         y: float,
         w: float,
         h: float,
-        layer: int = 0xFFFFFFFF,
-        mask: int = 0xFFFFFFFF,
+        layer: int = DEFAULT_LAYER,
+        mask: int = DEFAULT_LAYER,
         parent: Optional[Object2D] = None
     ):
         """ Initialise with fields.

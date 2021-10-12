@@ -15,11 +15,12 @@ Classes:
 from __future__ import annotations  # NOTE: This is necessary below Python 3.10
 
 from .aabb import AABB
+from .space import Space
 
 from pyglet.math import Vec2
 
 from dataclasses import dataclass
-from typing import Optional, Set, Tuple
+from typing import Optional, Tuple
 
 
 # TODO: Find a way to remove the need for this
@@ -198,7 +199,7 @@ class Body(AABB):
 
     def get_nearest_collision(
         self,
-        space: Set[AABB],
+        space: Space,
         velocity: Vec2,
     ) -> Optional[CollisionData]:
         """ Finds the nearest collision in the space, if any. """
@@ -221,7 +222,7 @@ class Body(AABB):
 
         return closest_data
 
-    def move(self, space: Set[AABB], velocity: Vec2) -> Vec2:
+    def move(self, space: Space, velocity: Vec2) -> Vec2:
         """ Moves as far as possible in one iteration, returning the remaining
         velocity calculated using the slide method.
         """
@@ -251,7 +252,7 @@ class Body(AABB):
 
     def move_and_slide(
         self,
-        space: Set[AABB],
+        space: Space,
         velocity: Vec2,
         max_bounce: int = 3,
     ):
