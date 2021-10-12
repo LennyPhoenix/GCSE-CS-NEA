@@ -5,11 +5,9 @@ Classes:
     Space
 """
 
-from __future__ import annotations
-
 from .aabb import AABB
 
-from typing import NewType, Set
+from typing import Set
 
 # Define as type hint
-Space = NewType("Space", Set[AABB])
+Space = Set[AABB]
