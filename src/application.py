@@ -51,7 +51,7 @@ class Application:
         """
         # Create our window
         self.window = pyglet.window.Window(
-            caption="Axis-Aligned Bounding Boxes!",
+            caption="Player Movement!",
             resizable=True,
             vsync=False,
             width=self.DEFAULT_WINDOW_SIZE.x,

@@ -15,7 +15,7 @@
     - [X] Split up swept algorithm
   - [ ] Player
     - [X] Movement
-    - [ ] Camera system (use groups)
+    - [X] Camera system (use groups)
     - [ ] Dash
     - [ ] Sprite
     - [ ] Animation
