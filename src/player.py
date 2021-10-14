@@ -8,6 +8,7 @@ Classes:
 from __future__ import annotations  # NOTE: This is necessary below Python 3.10
 
 from .body import Body
+from .camera import Camera
 from .space import Space
 
 import pyglet
@@ -19,7 +20,7 @@ from weakref import ref, ReferenceType as Ref
 
 
 class Player(Body):
-    # TODO: Add camera group
+    # TODO: Add documentation
 
     LAYER = 1 << 1
     DEBUG_COLOUR = (107, 248, 255)
@@ -40,7 +41,14 @@ class Player(Body):
             layer=Player.LAYER,
             mask=Body.DEFAULT_LAYER,
         )
-        self.create_debug_rect(Player.DEBUG_COLOUR, batch)
+
+        self.camera = Camera(6, 6, 1, parent=self)
+
+        self.create_debug_rect(
+            Player.DEBUG_COLOUR,
+            batch,
+            self.camera
+        )
 
         self.keys = keys
         self.space = space
@@ -59,6 +67,7 @@ class Player(Body):
         velocity = velocity * Vec2(50 * dt, 50 * dt)
 
         self.move_and_slide(self.space, velocity)
+        self.global_position = round(self.global_position)
         self.update_debug_rect()
 
     @property

@@ -14,6 +14,7 @@ from .game_manager import GameManager
 
 import pyglet
 from pyglet.window import key
+from pyglet.math import Vec2
 
 from enum import Enum
 
@@ -33,7 +34,7 @@ class Application:
     """
 
     # Set default size to a 720p window
-    DEFAULT_SIZE = DEFAULT_WIDTH, DEFAULT_HEIGHT = 1280, 720
+    DEFAULT_WINDOW_SIZE = Vec2(1280, 720)
 
     # For now we don't actually have a menu, so we just head straight into the
     # game here.
@@ -53,8 +54,8 @@ class Application:
             caption="Axis-Aligned Bounding Boxes!",
             resizable=True,
             vsync=False,
-            width=self.DEFAULT_WIDTH,
-            height=self.DEFAULT_HEIGHT,
+            width=self.DEFAULT_WINDOW_SIZE.x,
+            height=self.DEFAULT_WINDOW_SIZE.y,
         )
         # Push event handlers
         self.window.on_draw = self.on_draw

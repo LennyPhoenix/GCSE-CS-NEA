@@ -41,13 +41,24 @@ class GameManager:
         self.player = Player(Vec2(0, 0), self.space, self.keys, batch)
 
         self.box_1 = AABB(120, 85, 30, 30)
-        self.box_1.create_debug_rect(batch=batch)
+        self.box_1.create_debug_rect(
+            batch=batch,
+            group=self.player.camera
+        )
         self.space.add(self.box_1)
-        self.box_2 = AABB(100, 65, 30, 30)
-        self.box_2.create_debug_rect(batch=batch)
+
+        self.box_2 = AABB(150, 85, 30, 30)
+        self.box_2.create_debug_rect(
+            batch=batch,
+            group=self.player.camera
+        )
         self.space.add(self.box_2)
-        self.box_3 = AABB(140, 65, 30, 30)
-        self.box_3.create_debug_rect(batch=batch)
+
+        self.box_3 = AABB(180, 85, 30, 30)
+        self.box_3.create_debug_rect(
+            batch=batch,
+            group=self.player.camera
+        )
         self.space.add(self.box_3)
 
         # Set up our physics update method
@@ -55,6 +66,9 @@ class GameManager:
             self.on_fixed_update,
             self.FIXED_UPDATE_TIMESTEP
         )
+
+    def on_resize(self, width: float, height: float):
+        self.player.camera.on_window_resize(width, height)
 
     def on_fixed_update(self, dt: float):
         """ Physics update method, called at a fixed speed independant of
