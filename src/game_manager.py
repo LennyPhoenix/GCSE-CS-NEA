@@ -67,8 +67,17 @@ class GameManager:
             self.FIXED_UPDATE_TIMESTEP
         )
 
+    def on_key_press(self, symbol: int, modifiers: int):
+        """ Called every time the user presses a key on the keyboard. """
+        self.player.on_key_press(symbol, modifiers)
+
     def on_resize(self, width: float, height: float):
+        """ Called every time the window is resized. """
         self.player.camera.on_window_resize(width, height)
+
+    def on_update(self, dt: float):
+        """ Called every frame, dt is time passed since last frame. """
+        self.player.on_update(dt)
 
     def on_fixed_update(self, dt: float):
         """ Physics update method, called at a fixed speed independant of

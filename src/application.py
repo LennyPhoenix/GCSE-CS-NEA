@@ -87,9 +87,13 @@ class Application:
             # Set window's fullscreen to the opposite of the current value
             self.window.set_fullscreen(not self.window.fullscreen)
 
+        if self.current_state == ApplicationState.IN_GAME:
+            self.game_manager.on_key_press(symbol, modifiers)
+
     def on_update(self, dt: float):
         """ Called every frame, dt is the time passed since the last frame. """
-        pass  # Unused
+        if self.current_state == ApplicationState.IN_GAME:
+            self.game_manager.on_update(dt)
 
     def run(self):
         """ Fire 'er up! """

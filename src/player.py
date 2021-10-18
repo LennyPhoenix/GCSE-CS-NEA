@@ -22,12 +22,19 @@ from weakref import ref, ReferenceType as Ref
 class Player(Body):
     """ A physics body controllable by the user. """
 
+    # TODO: Figure out how to lock velocity during dash
+
     # Define the player's physics layer
     LAYER = 1 << 1
     # Define a nice debug colour to differentiate from other rects
     DEBUG_COLOUR = (107, 248, 255)
     # Define a default speed
     SPEED = 80
+    DASH_SPEED = 4  # Dash speed multiplier
+
+    # Timers
+    DASH_LENGTH = 0.2
+    dash_timer = 0
 
     # Store space as weakref to avoid cyclic references
     _space: Optional[Ref[Space]] = None
@@ -63,7 +70,13 @@ class Player(Body):
         self.keys = keys
         self.space = space
 
+    def on_update(self, dt: float):
+        """ Called every frame. """
+        if self.dash_timer >= 0:
+            self.dash_timer -= dt
+
     def on_fixed_update(self, dt: float):
+        """ Called every physics update. """
         # Use user input to determine movement vector
         vx, vy = 0, 0
         if self.keys[key.W]:
@@ -74,11 +87,15 @@ class Player(Body):
             vy -= 1
         if self.keys[key.D]:
             vx += 1
-
         # Normalise the vector, no speedy diagonal movement here!
         velocity = Vec2(vx, vy).normalize()
+
+        # Determine player speed
+        speed = self.SPEED * dt
+        if self.dash_timer >= 0:
+            speed *= self.DASH_SPEED
         # Multiply by speed and delta time to make movement frame-independant
-        velocity *= Vec2(self.SPEED * dt, self.SPEED * dt)
+        velocity *= Vec2(speed, speed)
 
         # Move the body...
         self.move_and_slide(self.space, velocity)
@@ -86,6 +103,11 @@ class Player(Body):
         self.global_position = round(self.global_position)
         # ...and update our debug rect!
         self.update_debug_rect()
+
+    def on_key_press(self, symbol: int, modifiers: int):
+        """ Called every time the user presses a key. """
+        if symbol == key.LSHIFT:
+            self.dash_timer = self.DASH_LENGTH
 
     @property
     def space(self) -> Optional[Space]:
