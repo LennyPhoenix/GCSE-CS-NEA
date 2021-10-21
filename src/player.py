@@ -15,6 +15,7 @@ import pyglet
 from pyglet.math import Vec2
 from pyglet.window import key
 
+from enum import auto, Enum
 from typing import Optional
 from weakref import ref, ReferenceType as Ref
 
@@ -30,11 +31,24 @@ class Player(Body):
     DEBUG_COLOUR = (107, 248, 255)
     # Define a default speed
     SPEED = 80
-    DASH_SPEED = 4  # Dash speed multiplier
 
-    # Timers
+    # Dash
+    DASH_SPEED = 4  # Initial Dash Speed
+    DASH_CONTROL = 0.5
     DASH_LENGTH = 0.2
     dash_timer = 0
+
+    # State Machine
+    class State(Enum):
+        IDLE = auto()
+        RUNNING = auto()
+        DASHING = auto()
+        DEFAULT = IDLE
+    state = State.DEFAULT
+
+    # Movement
+    input_vec = Vec2(0, 0)
+    dash_velocity = Vec2(0, 0)
 
     # Store space as weakref to avoid cyclic references
     _space: Optional[Ref[Space]] = None
@@ -70,13 +84,7 @@ class Player(Body):
         self.keys = keys
         self.space = space
 
-    def on_update(self, dt: float):
-        """ Called every frame. """
-        if self.dash_timer >= 0:
-            self.dash_timer -= dt
-
-    def on_fixed_update(self, dt: float):
-        """ Called every physics update. """
+    def get_input(self) -> Vec2:
         # Use user input to determine movement vector
         vx, vy = 0, 0
         if self.keys[key.W]:
@@ -88,14 +96,34 @@ class Player(Body):
         if self.keys[key.D]:
             vx += 1
         # Normalise the vector, no speedy diagonal movement here!
-        velocity = Vec2(vx, vy).normalize()
+        return Vec2(vx, vy).normalize()
 
+    def on_update(self, dt: float):
+        """ Called every frame. """
+        if self.state == self.State.DASHING:
+            self.dash_timer -= dt
+            if self.dash_timer <= 0:
+                self.state = self.State.RUNNING
+        else:
+            self.input_vec = self.get_input()
+            if self.input_vec == Vec2(0, 0):
+                self.state = self.State.IDLE
+            else:
+                self.state = self.State.RUNNING
+
+    def on_fixed_update(self, dt: float):
+        """ Called every physics update. """
         # Determine player speed
+        input = self.input_vec
         speed = self.SPEED * dt
-        if self.dash_timer >= 0:
+        if self.state == self.State.DASHING:
             speed *= self.DASH_SPEED
+            # Determine dash control
+            dash_control = self.get_input()
+            dash_control *= Vec2(self.DASH_CONTROL, self.DASH_CONTROL)
+            input += dash_control
         # Multiply by speed and delta time to make movement frame-independant
-        velocity *= Vec2(speed, speed)
+        velocity = input * Vec2(speed, speed)
 
         # Move the body...
         self.move_and_slide(self.space, velocity)
@@ -106,7 +134,8 @@ class Player(Body):
 
     def on_key_press(self, symbol: int, modifiers: int):
         """ Called every time the user presses a key. """
-        if symbol == key.LSHIFT:
+        if symbol == key.LSHIFT and self.input_vec != Vec2(0, 0):
+            self.state = self.State.DASHING
             self.dash_timer = self.DASH_LENGTH
 
     @property

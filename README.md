@@ -16,9 +16,9 @@
   - [ ] Player
     - [X] Movement
     - [X] Camera system (use groups)
-    - [ ] Dash
+    - [X] Dash
       - [X] Functionality
-      - [ ] Lock Velocity
+      - [X] Lock Velocity
     - [ ] Sprite
     - [ ] Animation
 - [ ] Networking and player syncing.

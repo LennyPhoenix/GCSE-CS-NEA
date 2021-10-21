@@ -16,16 +16,16 @@ import pyglet
 from pyglet.window import key
 from pyglet.math import Vec2
 
-from enum import Enum
+from enum import auto, Enum
 
 
 class ApplicationState(Enum):
     """ The different possible states for the Application. """
-    MAIN_MENU = 0
-    PLAY_MENU = 1
-    LOBBY_MENU = 2
-    IN_GAME = 3
-    SETTINGS_MENU = 4
+    MAIN_MENU = auto()
+    PLAY_MENU = auto()
+    LOBBY_MENU = auto()
+    IN_GAME = auto()
+    SETTINGS_MENU = auto()
 
 
 class Application:

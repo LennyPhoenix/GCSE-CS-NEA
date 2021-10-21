@@ -53,7 +53,7 @@ def get_axis_collision_distances(
 
         Tuple[float, float]
     """
-    r_to_ol = op - (p + w)
+    r_to_ol = op - (p + w) # Right to other left
     l_to_or = (op + ow) - p
 
     if v > 0:
