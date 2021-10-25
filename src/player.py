@@ -36,7 +36,9 @@ class Player(Body):
     DASH_SPEED = 4  # Initial Dash Speed
     DASH_CONTROL = 0.5
     DASH_LENGTH = 0.2
+    DASH_COOLDOWN = 0.1
     dash_timer = 0
+    dash_cooldown_timer = 0
 
     # State Machine
     class State(Enum):
@@ -105,6 +107,7 @@ class Player(Body):
             if self.dash_timer <= 0:
                 self.state = self.State.RUNNING
         else:
+            self.dash_cooldown_timer -= dt
             self.input_vec = self.get_input()
             if self.input_vec == Vec2(0, 0):
                 self.state = self.State.IDLE
@@ -134,9 +137,15 @@ class Player(Body):
 
     def on_key_press(self, symbol: int, modifiers: int):
         """ Called every time the user presses a key. """
-        if symbol == key.LSHIFT and self.input_vec != Vec2(0, 0):
+        can_dash = (
+            symbol == key.SPACE
+            and self.input_vec != Vec2(0, 0)
+            and self.dash_cooldown_timer <= 0
+        )
+        if can_dash:
             self.state = self.State.DASHING
             self.dash_timer = self.DASH_LENGTH
+            self.dash_cooldown_timer = self.DASH_COOLDOWN
 
     @property
     def space(self) -> Optional[Space]:
