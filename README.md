@@ -1,5 +1,21 @@
 # Computer Science Non-Examined Assessment (GCSE)
 
+## How to Run
+
+### Poetry (Recommended)
+
+- Install dependencies:
+  `poetry update`
+- Run:
+  `poetry run python main.py`
+
+### Pip
+
+- Install dependencies:
+  `python -m pip install pyglet==1.5.21`
+- Run:
+  `python main.py`
+
 ## Progress
 
 > It should be noted that this is not meant to be a hard list for what I will work on, I will likely change the order and add more sub-tasks as I go.
