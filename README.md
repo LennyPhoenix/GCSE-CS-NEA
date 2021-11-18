@@ -22,21 +22,21 @@
 
 - [X] Project setup, get a decent dev environment.
 - [X] Application with Window, Batches and Events.
-- [ ] Game class with Camera and Player movement.
+- [X] Game class with Camera and Player movement.
   - [X] Game Manager
   - [X] Physics system
     - [X] AABBs
     - [X] Physics Bodies
     - [X] Documentation
     - [X] Split up swept algorithm
-  - [ ] Player
+  - [X] Player
     - [X] Movement
     - [X] Camera system (use groups)
     - [X] Dash
       - [X] Functionality
       - [X] Lock Velocity
-    - [ ] Sprite
-    - [ ] Animation
+    - [X] Sprite
+    - [X] Animation
 - [ ] Networking and player syncing.
 - [ ] Combat and player UI.
 - [ ] Dungeon generation.

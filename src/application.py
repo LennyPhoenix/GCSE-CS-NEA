@@ -49,6 +49,7 @@ class Application:
         """ Initialise the application: set up our window and graphics batch,
         and schedule any methods.
         """
+
         # Create our window
         self.window = pyglet.window.Window(
             caption="Player Movement!",

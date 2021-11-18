@@ -10,6 +10,7 @@ from __future__ import annotations  # NOTE: This is necessary below Python 3.10
 from .body import Body
 from .camera import Camera
 from .space import Space
+from .zsprite import ZSprite
 
 import pyglet
 from pyglet.math import Vec2
@@ -23,8 +24,18 @@ from weakref import ref, ReferenceType as Ref
 class Player(Body):
     """ A physics body controllable by the user. """
 
-    # TODO: Figure out how to lock velocity during dash
-
+    # Resources
+    SPRITE_SHEET = pyglet.resource.image("sprites/player.png")
+    IMG_GRID = pyglet.image.ImageGrid(SPRITE_SHEET, 2, 4)
+    IDLE = pyglet.image.Animation.from_image_sequence(
+        IMG_GRID[:2],
+        1/4,
+    )
+    MOVING = pyglet.image.Animation.from_image_sequence(
+        IMG_GRID[4:8],
+        1/8,
+    )
+    
     # Define the player's physics layer
     LAYER = 1 << 1
     # Define a nice debug colour to differentiate from other rects
@@ -46,11 +57,14 @@ class Player(Body):
         RUNNING = auto()
         DASHING = auto()
         DEFAULT = IDLE
-    state = State.DEFAULT
+    _state = State.DEFAULT
 
     # Movement
     input_vec = Vec2(0, 0)
     dash_velocity = Vec2(0, 0)
+
+    # Sprite
+    sprite: ZSprite
 
     # Store space as weakref to avoid cyclic references
     _space: Optional[Ref[Space]] = None
@@ -80,6 +94,15 @@ class Player(Body):
             Player.DEBUG_COLOUR,
             batch,
             self.camera
+        )
+
+        # Create Sprite
+        self.sprite = ZSprite(
+            self.IDLE,
+            self.global_x + self.w/2,
+            self.global_y,
+            -self.global_y/1000,
+            batch=batch, group=self.camera
         )
 
         # Store space and key handler
@@ -118,6 +141,12 @@ class Player(Body):
         """ Called every physics update. """
         # Determine player speed
         input = self.input_vec
+
+        if self.input_vec.x > 0:
+            self.sprite.scale_x = 1
+        elif self.input_vec.x < 0:
+            self.sprite.scale_x = -1
+
         speed = self.SPEED * dt
         if self.state == self.State.DASHING:
             speed *= self.DASH_SPEED
@@ -134,6 +163,11 @@ class Player(Body):
         self.global_position = round(self.global_position)
         # ...and update our debug rect!
         self.update_debug_rect()
+        self.sprite.update(
+            self.global_x + self.w/2, 
+            self.global_y, 
+            -self.global_y/1000
+        )
 
     def on_key_press(self, symbol: int, modifiers: int):
         """ Called every time the user presses a key. """
@@ -166,3 +200,21 @@ class Player(Body):
             self.space.add(self)  # Add to new space
         else:
             self._space = None
+    
+    @property
+    def state(self) -> Player.State:
+        return self._state
+    
+    @state.setter
+    def state(self, new_state: Player.State):
+        if new_state != self._state:
+            self._state = new_state
+            if new_state == Player.State.IDLE:
+                self.sprite.image = self.IDLE
+            elif new_state == Player.State.RUNNING:
+                self.sprite.image = self.MOVING
+        
+
+
+for img in Player.IMG_GRID:
+    img.anchor_x = img.width / 2
