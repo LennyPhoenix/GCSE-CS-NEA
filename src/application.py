@@ -2,13 +2,14 @@
 
 Classes:
 
-    ApplicationState
     Application
 
 Functions:
 
     run()
 """
+
+from __future__ import annotations  # NOTE: This is necessary below Python 3.10
 
 from .game_manager import GameManager
 
@@ -19,15 +20,6 @@ from pyglet.math import Vec2
 from enum import auto, Enum
 
 
-class ApplicationState(Enum):
-    """ The different possible states for the Application. """
-    MAIN_MENU = auto()
-    PLAY_MENU = auto()
-    LOBBY_MENU = auto()
-    IN_GAME = auto()
-    SETTINGS_MENU = auto()
-
-
 class Application:
     """ Top level application manager, controls everything including the window
     and any events.
@@ -36,10 +28,15 @@ class Application:
     # Set default size to a 720p window
     DEFAULT_WINDOW_SIZE = Vec2(1280, 720)
 
-    # For now we don't actually have a menu, so we just head straight into the
-    # game here.
-    DEFAULT_STATE = ApplicationState.IN_GAME
-    _current_state: ApplicationState = None
+    # State machine
+    class State(Enum):
+        MAIN_MENU = auto()
+        PLAY_MENU = auto()
+        LOBBY_MENU = auto()
+        IN_GAME = auto()
+        SETTINGS_MENU = auto()
+        DEFAULT = IN_GAME
+    _current_state: State = None
 
     # We don't need to initialise these until the application state has been
     # switched over to them. For now we just forward declare their types.
@@ -55,6 +52,7 @@ class Application:
             caption="Player Movement!",
             resizable=True,
             vsync=False,
+            fullscreen=True,
             width=self.DEFAULT_WINDOW_SIZE.x,
             height=self.DEFAULT_WINDOW_SIZE.y,
         )
@@ -71,7 +69,7 @@ class Application:
         self.batch = pyglet.graphics.Batch()
 
         # Set the application state
-        self.current_state = self.DEFAULT_STATE
+        self.current_state = Application.State.DEFAULT
 
         # Schedule our update methods
         pyglet.clock.schedule(self.on_update)
@@ -88,12 +86,12 @@ class Application:
             # Set window's fullscreen to the opposite of the current value
             self.window.set_fullscreen(not self.window.fullscreen)
 
-        if self.current_state == ApplicationState.IN_GAME:
+        if self.current_state == Application.State.IN_GAME:
             self.game_manager.on_key_press(symbol, modifiers)
 
     def on_update(self, dt: float):
         """ Called every frame, dt is the time passed since the last frame. """
-        if self.current_state == ApplicationState.IN_GAME:
+        if self.current_state == Application.State.IN_GAME:
             self.game_manager.on_update(dt)
 
     def run(self):
@@ -101,17 +99,17 @@ class Application:
         pyglet.app.run()  # This just starts the event loop
 
     @property
-    def current_state(self) -> ApplicationState:
+    def current_state(self) -> Application.State:
         """ The current application state/focus. """
         return self._current_state
 
     @current_state.setter
-    def current_state(self, new_state: ApplicationState):
+    def current_state(self, new_state: Application.State):
         """ Application state setter method. """
         # Only update the state if it has been changed.
         if new_state != self.current_state:
             # Initialise the new state manager:
-            if new_state == ApplicationState.IN_GAME:
+            if new_state == Application.State.IN_GAME:
                 self.game_manager = GameManager(
                     batch=self.batch,
                     keys=self.keys
@@ -119,7 +117,7 @@ class Application:
                 self.window.push_handlers(self.game_manager)
 
             # Kill the old state manager:
-            if self.current_state == ApplicationState.IN_GAME:
+            if self.current_state == Application.State.IN_GAME:
                 self.window.remove_handlers(self.game_manager)
                 del self.game_manager
 

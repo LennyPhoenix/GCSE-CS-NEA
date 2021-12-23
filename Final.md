@@ -1,60 +1,19 @@
-# Computer Science Non-Examined Assessment (GCSE)
+# GCSE Non-Examined Assessment
 
-## How to Run
+> Lenny Critchley, 2022
 
-### Poetry (Recommended)
+This file will cover a breakdown of my GCSE NEA project for 2022.
 
-- Install dependencies:
-  `poetry update`
-- Run:
-  `poetry run python main.py`
+## Task Introduction
 
-### Pip
+The task was to write a graphical game that can be played from any common desktop operating system (such as Windows, MacOS and common Linux distros).
 
-- Install dependencies:
-  `python -m pip install pyglet==1.5.21`
-- Run:
-  `python main.py`
+## Plan 
 
-## Progress
+I plan to develop a procedurally-generated[^1] roguelite[^2] game, using top-down graphics and a full 2D physics system. If possible, I also plan to implement multiplayer networking in the game.
 
-> It should be noted that this is not meant to be a hard list for what I will work on, I will likely change the order and add more sub-tasks as I go.
-
-- [X] Project setup, get a decent dev environment.
-- [X] Application with Window, Batches and Events.
-- [X] Game class with Camera and Player movement.
-  - [X] Game Manager
-  - [X] Physics system
-    - [X] AABBs
-    - [X] Physics Bodies
-    - [X] Documentation
-    - [X] Split up swept algorithm
-  - [X] Player
-    - [X] Movement
-    - [X] Camera system (use groups)
-    - [X] Dash
-      - [X] Functionality
-      - [X] Lock Velocity
-    - [X] Sprite
-    - [X] Animation
-- [ ] Combat and player UI.
-  - [ ] Weapon classes
-    - [ ] Melee
-  - [ ] Health system
-  - [ ] Inventory system
-- [ ] Dungeon generation.
-- [ ] Enemies.
-- [ ] Player classes and different weapons.
-- [ ] Networking and player syncing.
-- [ ] Chest rooms and combat rooms.
-- [ ] Exit room.
-- [ ] Main menu and UI.
-
-## Analysis
-
-### Introduction
-
-Write a graphical game that can be played from any common desktop operating system (such as Windows, OSX, and Linux).
+[^1]: <https://en.wikipedia.org/wiki/Procedural_generation>
+[^2]: [Roguelikes (Wikipedia)](https://en.wikipedia.org/wiki/Roguelike), [Roguelites (Wikipedia)](https://en.wikipedia.org/wiki/Roguelite)
 
 ### User Experience
 
@@ -93,6 +52,8 @@ Write a graphical game that can be played from any common desktop operating syst
   - Credits and more detailed information about this task.
 
 ## Design
+
+I plan to use the Pyglet cross-platform graphics library for window management and sprite drawing, the physics solution will instead be developed from scratch.
 
 ### Decomposition
 
@@ -138,7 +99,7 @@ Write a graphical game that can be played from any common desktop operating syst
   - Manages all the "game" processes. These include:
     - The dungeon itself
     - Entity management (Players, Enemies, Projectiles, Items, etc.)
-    - Physics, likely using Pymunk
+    - Physics Space
     - Win and loss conditions
     - Syncing data between clients
   - Contains:
@@ -177,14 +138,14 @@ Write a graphical game that can be played from any common desktop operating syst
   - Host has full control, and should send dungeon and entity data to each client.
   - Clients compute their own player movement and resync with the host.
 
-### Physics System
+## The Physics System
 
 I have opted to avoid using a library like Pymunk for my physics system as it provides too many unnecessary tools that ultimately make the game's codebase more complex than it needs to be.
 
 My physics system needs to do a few basic things, and nothing more:
 
 - Allow objects to detect collisions between each other
-- Resolve collisions and avoid tunneling (using swept AABBs)
+- Resolve collisions and avoid tunneling (using swept AABBs[^3][^4])
 - Mask out specific collision layers
   - e.g. enemies + enemy bullets do not need to collide
 - Allow "move and slide" behaviour
@@ -193,34 +154,5 @@ My physics system needs to do a few basic things, and nothing more:
 
 Something simple such as swept AABB collisions can solve this problem very easily and efficiently.
 
-#### References
-
-- [gamedev.net](https://www.gamedev.net/articles/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/)
-- [amanotes.com](https://www.amanotes.com/post/using-swept-aabb-to-detect-and-process-collision)
-
-#### Breakdown
-
-- Object2D
-  - An object in 2D space
-  - X & Y - Local position
-  - Parent - The parent object
-  - Global X & Y - The position relative to world origin
-- AABB (Axis-Aligned Bounding Box, inherits Object2D)
-  - Width & Height - Bounding box extension
-  - Layer and Mask - Bit fields for collision masks
-  - Is Colliding AABB method: Takes AABB and checks if self and the other box overlap.
-  - Is Colliding Point method: Takes coordinate pair and checks if the point is within self.
-  - Get Broad Phase method: Takes a velocity pair and returns the broad phase bounding box of self moved by the given velocity.
-  - Get Collision Time method: Takes a velocity and another AABB, and returns the collision time between them. (0 to 1)
-  - Create Debug Rect method: Takes `*args` and `**kwargs` for a pyglet rect and generates a debug rectangle for the AABB.
-  - Get Debug Rect method: Returns the current debug rect, may be `None`.
-  - Update Debug Rect method: Updates the position, width, and height of the current debug rect.
-- Body (Inherits AABB)
-  - Move method: Gets nearest collision data and resolves by stopping at collision, returning the remaining velocity.
-  - Move and Slide: Repeatedly moves until velocity is zero.
-    > Check "Responses" section of the gamedev.net article for more details here.
-  - Get nearest collision: Loops over each bounding box in the space given and returns the collision data for the nearest collision.
-    > This will very likely need optimising, look into spatial hashing and BB tree.
-- Space
-  - Really just needs to be a set of AABBs.
-  - When optimising, maybe turn this into a spatial hash or BB tree.
+[^3]: <https://www.gamedev.net/articles/programming/general-and-gameplay-programming/swept-aabb-collision-detection-and-response-r3084/>
+[^4]: <https://www.amanotes.com/post/using-swept-aabb-to-detect-and-process-collision>

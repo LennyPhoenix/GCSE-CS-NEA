@@ -7,10 +7,12 @@ Classes:
 
 from __future__ import annotations  # NOTE: This is necessary below Python 3.10
 
+from . import weapons
 from .body import Body
 from .camera import Camera
 from .space import Space
-from .zsprite import ZSprite
+from .weapon import Weapon
+from .zsprite import y_to_z, ZSprite
 
 import pyglet
 from pyglet.math import Vec2
@@ -66,6 +68,9 @@ class Player(Body):
     # Sprite
     sprite: ZSprite
 
+    # Weapon
+    current_weapon: Weapon
+
     # Store space as weakref to avoid cyclic references
     _space: Optional[Ref[Space]] = None
 
@@ -101,13 +106,21 @@ class Player(Body):
             self.IDLE,
             self.global_x + self.w/2,
             self.global_y,
-            -self.global_y/1000,
+            y_to_z(self.global_y),
             batch=batch, group=self.camera
         )
 
         # Store space and key handler
         self.keys = keys
         self.space = space
+
+        # Weapon
+        self.current_weapon = weapons.Sword(
+            batch, 
+            self.camera,
+            self
+        )
+        self.current_weapon.position = (8, 8)
 
     def get_input(self) -> Vec2:
         # Use user input to determine movement vector
@@ -144,8 +157,12 @@ class Player(Body):
 
         if self.input_vec.x > 0:
             self.sprite.scale_x = 1
+            self.current_weapon.x = 8
+            self.current_weapon.sprite.scale_x = 1
         elif self.input_vec.x < 0:
             self.sprite.scale_x = -1
+            self.current_weapon.x = 4
+            self.current_weapon.sprite.scale_x = -1
 
         speed = self.SPEED * dt
         if self.state == self.State.DASHING:
@@ -165,9 +182,12 @@ class Player(Body):
         self.update_debug_rect()
         self.sprite.update(
             self.global_x + self.w/2, 
-            self.global_y, 
-            -self.global_y/1000
+            self.global_y,
+            y_to_z(self.global_y)
         )
+
+        # Propagate fixed update to weapon
+        self.current_weapon.on_fixed_update(dt)
 
     def on_key_press(self, symbol: int, modifiers: int):
         """ Called every time the user presses a key. """

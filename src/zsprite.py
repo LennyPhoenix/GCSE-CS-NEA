@@ -13,6 +13,8 @@ from pyglet.gl import *
 pyglet.image.Texture.default_mag_filter = pyglet.gl.GL_NEAREST
 pyglet.image.Texture.default_min_filter = pyglet.gl.GL_NEAREST
 
+def y_to_z(y: float):
+    return -y / 1000
 
 class ZSpriteGroup(pyglet.graphics.Group):
 
