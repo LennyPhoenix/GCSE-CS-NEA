@@ -2,6 +2,7 @@
 
 Classes:
 
+    DeepProjection
     Application
 
 Functions:
@@ -11,13 +12,29 @@ Functions:
 
 from __future__ import annotations  # NOTE: This is necessary below Python 3.10
 
-from .game_manager import GameManager
+from .game_manager import GameManager  # Import our Game Manager class
 
 import pyglet
+from pyglet import gl
 from pyglet.window import key
 from pyglet.math import Vec2
 
 from enum import auto, Enum
+
+
+class DeepProjection(pyglet.window.Projection):
+    """ A 2D orthographic projection with extra depth. """
+
+    def set(self, window_width, window_height, viewport_width, viewport_height):
+        gl.glViewport(0, 0, max(1, viewport_width), max(1, viewport_height))
+        gl.glMatrixMode(gl.GL_PROJECTION)
+        gl.glLoadIdentity()
+        gl.glOrtho(
+            0, max(1, window_width),
+            0, max(1, window_height),
+            -10000, 10000
+        )
+        gl.glMatrixMode(gl.GL_MODELVIEW)
 
 
 class Application:
@@ -40,7 +57,11 @@ class Application:
 
     # We don't need to initialise these until the application state has been
     # switched over to them. For now we just forward declare their types.
+    # main_menu: MainMenu (unimplemented)
+    # play_menu: PlayMenu (unimplemented)
+    # lobby_menu: LobbyMenu (unimplemented)
     game_manager: GameManager
+    # settings_menu: SettingsMenu (unimplemented)
 
     def __init__(self):
         """ Initialise the application: set up our window and graphics batch,
@@ -52,10 +73,11 @@ class Application:
             caption="Player Movement!",
             resizable=True,
             vsync=False,
-            fullscreen=True,
             width=self.DEFAULT_WINDOW_SIZE.x,
             height=self.DEFAULT_WINDOW_SIZE.y,
         )
+        self.window.projection = DeepProjection()
+
         # Push event handlers
         self.window.on_draw = self.on_draw
         self.window.on_key_press = self.on_key_press
@@ -86,11 +108,13 @@ class Application:
             # Set window's fullscreen to the opposite of the current value
             self.window.set_fullscreen(not self.window.fullscreen)
 
+        # Send the event to the game manager
         if self.current_state == Application.State.IN_GAME:
             self.game_manager.on_key_press(symbol, modifiers)
 
     def on_update(self, dt: float):
         """ Called every frame, dt is the time passed since the last frame. """
+        # Send the event to the game manager
         if self.current_state == Application.State.IN_GAME:
             self.game_manager.on_update(dt)
 

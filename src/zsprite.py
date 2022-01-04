@@ -1,6 +1,9 @@
 """ 3-dimensional sprite implementation.
 Allows Z-sorting.
 
+NOTE: This file is not part of the NEA project itself, and is simply a helper
+dependency for the project that could not be installed via PIP or Poetry.
+
 Classes:
 
     ZSpriteGroup
@@ -10,11 +13,11 @@ Classes:
 import pyglet
 from pyglet.gl import *
 
+import math
+
 pyglet.image.Texture.default_mag_filter = pyglet.gl.GL_NEAREST
 pyglet.image.Texture.default_min_filter = pyglet.gl.GL_NEAREST
 
-def y_to_z(y: float):
-    return -y / 1000
 
 class ZSpriteGroup(pyglet.graphics.Group):
 
@@ -45,7 +48,6 @@ class ZSpriteGroup(pyglet.graphics.Group):
         glDisable(self.texture.target)
         glDisable(GL_DEPTH_TEST)
 
-
     def __repr__(self):
         return '%s(%r-%d)' % (self.__class__.__name__, self.texture, self.texture.id)
 
@@ -59,20 +61,19 @@ class ZSpriteGroup(pyglet.graphics.Group):
     def __hash__(self):
         return hash((id(self.parent), self.texture.id, self.texture.target,
                      self.blend_src, self.blend_dest))
-                     
-                     
+
 
 class ZSprite(pyglet.sprite.Sprite):
     """ Supports Z layer """
 
     def __init__(self,
-             img, x=0, y=0, z=0,
-             blend_src=GL_SRC_ALPHA,
-             blend_dest=GL_ONE_MINUS_SRC_ALPHA,
-             batch=None,
-             group=None,
-             usage='dynamic',
-             subpixel=False):
+                 img, x=0, y=0, z=0,
+                 blend_src=GL_SRC_ALPHA,
+                 blend_dest=GL_ONE_MINUS_SRC_ALPHA,
+                 batch=None,
+                 group=None,
+                 usage='dynamic',
+                 subpixel=False):
         if batch is not None:
             self._batch = batch
 
@@ -103,9 +104,9 @@ class ZSprite(pyglet.sprite.Sprite):
         if self._group.parent == group:
             return
         self._group = self._group.__class__(self._texture,
-                                  self._group.blend_src,
-                                  self._group.blend_dest,
-                                  group)
+                                            self._group.blend_src,
+                                            self._group.blend_dest,
+                                            group)
         if self._batch is not None:
             self._batch.migrate(self._vertex_list, GL_QUADS, self._group,
                                 self._batch)
@@ -117,10 +118,10 @@ class ZSprite(pyglet.sprite.Sprite):
             vertex_format = 'v3i/%s' % self._usage
         if self._batch is None:
             self._vertex_list = pyglet.graphics.vertex_list(4, vertex_format,
-                'c4B', ('t3f', self._texture.tex_coords))
+                                                            'c4B', ('t3f', self._texture.tex_coords))
         else:
             self._vertex_list = self._batch.add(4, GL_QUADS, self._group,
-                vertex_format, 'c4B', ('t3f', self._texture.tex_coords))
+                                                vertex_format, 'c4B', ('t3f', self._texture.tex_coords))
 
         self._update_position()
         self._update_color()

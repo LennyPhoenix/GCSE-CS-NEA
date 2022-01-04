@@ -7,19 +7,23 @@ Classes:
 
 from __future__ import annotations  # NOTE: This is necessary below Python 3.10
 
+# Import all our classes and methods we need
 from . import weapons
 from .body import Body
 from .camera import Camera
 from .space import Space
 from .weapon import Weapon
-from .zsprite import y_to_z, ZSprite
+from .zsprite import ZSprite
 
+# Pyglet submodules
 import pyglet
 from pyglet.math import Vec2
 from pyglet.window import key
 
+# Enum for the state machine
 from enum import auto, Enum
 from typing import Optional
+# Weakref for storing the physics space
 from weakref import ref, ReferenceType as Ref
 
 
@@ -30,14 +34,14 @@ class Player(Body):
     SPRITE_SHEET = pyglet.resource.image("sprites/player.png")
     IMG_GRID = pyglet.image.ImageGrid(SPRITE_SHEET, 2, 4)
     IDLE = pyglet.image.Animation.from_image_sequence(
-        IMG_GRID[:2],
+        IMG_GRID[:2],  # Take a slice of the image grid
         1/4,
     )
     MOVING = pyglet.image.Animation.from_image_sequence(
-        IMG_GRID[4:8],
+        IMG_GRID[4:8],  # Take a slice of the image grid
         1/8,
     )
-    
+
     # Define the player's physics layer
     LAYER = 1 << 1
     # Define a nice debug colour to differentiate from other rects
@@ -106,8 +110,9 @@ class Player(Body):
             self.IDLE,
             self.global_x + self.w/2,
             self.global_y,
-            y_to_z(self.global_y),
-            batch=batch, group=self.camera
+            -self.global_y,
+            batch=batch, group=self.camera,
+            subpixel=True
         )
 
         # Store space and key handler
@@ -116,11 +121,11 @@ class Player(Body):
 
         # Weapon
         self.current_weapon = weapons.Sword(
-            batch, 
+            batch,
             self.camera,
             self
         )
-        self.current_weapon.position = (8, 8)
+        self.current_weapon.position = (10, 8)
 
     def get_input(self) -> Vec2:
         # Use user input to determine movement vector
@@ -139,12 +144,17 @@ class Player(Body):
     def on_update(self, dt: float):
         """ Called every frame. """
         if self.state == self.State.DASHING:
+            # Count down on the dash timer
             self.dash_timer -= dt
             if self.dash_timer <= 0:
+                # If it reached 0, stop dashing
                 self.state = self.State.RUNNING
         else:
+            # Count down the dash cooldown timer
             self.dash_cooldown_timer -= dt
+            # Receive user input
             self.input_vec = self.get_input()
+            # Determine state
             if self.input_vec == Vec2(0, 0):
                 self.state = self.State.IDLE
             else:
@@ -155,14 +165,16 @@ class Player(Body):
         # Determine player speed
         input = self.input_vec
 
+        # Flip sprite and weapon based on player movement.
+        # This could be simplified, but this works for now.
         if self.input_vec.x > 0:
             self.sprite.scale_x = 1
-            self.current_weapon.x = 8
-            self.current_weapon.sprite.scale_x = 1
+            self.current_weapon.x = 10
+            self.current_weapon.set_flipped(True)
         elif self.input_vec.x < 0:
             self.sprite.scale_x = -1
-            self.current_weapon.x = 4
-            self.current_weapon.sprite.scale_x = -1
+            self.current_weapon.x = 2
+            self.current_weapon.set_flipped(False)
 
         speed = self.SPEED * dt
         if self.state == self.State.DASHING:
@@ -181,9 +193,9 @@ class Player(Body):
         # ...and update our debug rect!
         self.update_debug_rect()
         self.sprite.update(
-            self.global_x + self.w/2, 
+            self.global_x + self.w/2,
             self.global_y,
-            y_to_z(self.global_y)
+            -self.global_y
         )
 
         # Propagate fixed update to weapon
@@ -192,14 +204,14 @@ class Player(Body):
     def on_key_press(self, symbol: int, modifiers: int):
         """ Called every time the user presses a key. """
         can_dash = (
-            symbol == key.SPACE
-            and self.input_vec != Vec2(0, 0)
-            and self.dash_cooldown_timer <= 0
+            symbol == key.SPACE  # Space is pressed
+            and self.input_vec != Vec2(0, 0)  # We are moving
+            and self.dash_cooldown_timer <= 0  # The cooldown is over
         )
         if can_dash:
-            self.state = self.State.DASHING
-            self.dash_timer = self.DASH_LENGTH
-            self.dash_cooldown_timer = self.DASH_COOLDOWN
+            self.state = self.State.DASHING  # Start dashing
+            self.dash_timer = self.DASH_LENGTH  # Reset the dash timer
+            self.dash_cooldown_timer = self.DASH_COOLDOWN  # Reset cooldown
 
     @property
     def space(self) -> Optional[Space]:
@@ -220,21 +232,24 @@ class Player(Body):
             self.space.add(self)  # Add to new space
         else:
             self._space = None
-    
+
     @property
     def state(self) -> Player.State:
         return self._state
-    
+
     @state.setter
     def state(self, new_state: Player.State):
         if new_state != self._state:
             self._state = new_state
+            # Update the sprite to match the state
             if new_state == Player.State.IDLE:
+                # Idle animation
                 self.sprite.image = self.IDLE
             elif new_state == Player.State.RUNNING:
+                # Running animation
                 self.sprite.image = self.MOVING
-        
 
 
+# Set the player's images to use a centered X position
 for img in Player.IMG_GRID:
     img.anchor_x = img.width / 2
