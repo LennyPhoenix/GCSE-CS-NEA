@@ -26,6 +26,7 @@
      * [Get Collision Normals](#get-collision-normals)
      * [Body](#body)
    * [Game Manager](#game-manager)
+   * [Camera](#camera)
    * [Tile Data](#tile-data)
    * [Tile](#tile)
    * [Dungeon](#dungeon)
@@ -34,8 +35,20 @@
    * [Entity](#entity)
    * [Player](#player)
    * [Enemy](#enemy)
+   * [Weapon Stats](#weapon-stats)
+   * [Weapon](#weapon)
+   * [Projectile](#projectile)
+   * [Network Manager](#network-manager)
 4. [Implementation](#implementation)
+   * [Application](#application)
    * [Physics System](#physics-system)
+   * [Game Manager](#game-manager)
+   * [Camera](#camera)
+   * [Player](#player)
+   * [Weapon](#weapon)
+   * [Weapons](#weapons)
+5. [Testing](#testing)
+6. [Conclusion](#conclusion)
 
 ## Task Introduction
 
